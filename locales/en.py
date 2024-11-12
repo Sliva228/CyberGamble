@@ -19,4 +19,22 @@ Choose parameters to configure:''',
     'moderation_menu': '🛡️ Moderation menu',
     'user_banned': '🚫 User banned',
     'user_unbanned': '✅ User unbanned',
+    'select_bet': '💰 Select your bet:',
+    'blackjack_game': '''🎲 Blackjack
+
+Your cards: {} ({}⭐️)
+Dealer cards: {}
+Bet: {} coins''',
+    'blackjack_result': '''🎲 Blackjack
+
+Your cards: {} ({}⭐️)
+Dealer cards: {} ({}⭐️)''',
+    'blackjack_win': '🎉 Congratulations! You won {} coins!',
+    'blackjack_lose': '😔 You lost {} coins.',
+    'blackjack_draw': '🤝 Draw! Your bet has been returned.',
+    'blackjack_bust': '💥 Bust! You lost {} coins.',
+    'daily_limit_reached': '⚠️ Daily game limit reached!',
+    'insufficient_balance': '⚠️ Insufficient balance for bet!',
+    'game_not_found': '❌ Game not found!',
+    'error_occurred': '❌ An error occurred! Please try again.'
 }
