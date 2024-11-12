@@ -117,19 +117,40 @@ class KeyboardManager:
             inline_keyboard=self.layouts[layout_type](buttons)
         )
 
-    def get_moderation_keyboard(self, user_id: int, is_banned: bool, lang: str = 'ru') -> InlineKeyboardMarkup:
+    def get_bet_keyboard(self, layout_type: str, lang: str = 'ru') -> InlineKeyboardMarkup:
         texts = {
-            'ru': ['🚫 Забанить', '✅ Разбанить', '🔙 Назад'],
-            'en': ['🚫 Ban', '✅ Unban', '🔙 Back']
+            'ru': {
+                'bets': ['💰 100', '💰 250', '💰 500', '💰 1000'],
+                'back': '🔙 Назад'
+            },
+            'en': {
+                'bets': ['💰 100', '💰 250', '💰 500', '💰 1000'],
+                'back': '🔙 Back'
+            }
         }
         
-        buttons = [[
-            InlineKeyboardButton(
-                text=texts[lang][1 if is_banned else 0],
-                callback_data=f'{"unban" if is_banned else "ban"}_{user_id}'
-            )
-        ], [
-            InlineKeyboardButton(text=texts[lang][2], callback_data='main_menu')
-        ]]
+        buttons = [
+            {'text': bet, 'callback_data': f'bet_{bet.split()[1]}'}
+            for bet in texts[lang]['bets']
+        ]
+        buttons.append({'text': texts[lang]['back'], 'callback_data': 'games'})
         
-        return InlineKeyboardMarkup(inline_keyboard=buttons)
+        return InlineKeyboardMarkup(
+            inline_keyboard=self.layouts[layout_type](buttons)
+        )
+
+    def get_blackjack_keyboard(self, layout_type: str, lang: str = 'ru') -> InlineKeyboardMarkup:
+        texts = {
+            'ru': ['🎯 Взять карту', '✋ Хватит', '🔙 Выйти'],
+            'en': ['🎯 Hit', '✋ Stand', '🔙 Exit']
+        }
+        
+        buttons = [
+            {'text': texts[lang][0], 'callback_data': 'blackjack_hit'},
+            {'text': texts[lang][1], 'callback_data': 'blackjack_stand'},
+            {'text': texts[lang][2], 'callback_data': 'games'}
+        ]
+        
+        return InlineKeyboardMarkup(
+            inline_keyboard=self.layouts[layout_type](buttons)
+        )
