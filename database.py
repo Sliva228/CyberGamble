@@ -137,6 +137,41 @@ class Database:
             cursor.execute('UPDATE users SET language = ? WHERE user_id = ?', (language, user_id))
         self.conn.commit()
 
+    def update_balance(self, user_id: int, amount: int):
+        cursor = self.conn.cursor()
+        cursor.execute('''
+        UPDATE users 
+        SET balance = balance + ?
+        WHERE user_id = ?
+        ''', (amount, user_id))
+        self.conn.commit()
+
+    def update_stats(self, user_id: int, result: str):
+        cursor = self.conn.cursor()
+        updates = []
+        params = []
+
+        updates.append('games_played = games_played + 1')
+        updates.append('last_game = ?')
+        params.append(datetime.now())
+        updates.append('games_today = games_today + 1')
+
+        if result == 'win':
+            updates.append('wins = wins + 1')
+            updates.append('rating = rating + 25')
+        elif result == 'lose':
+            updates.append('rating = MAX(0, rating - 15)')
+
+        query = f'''
+        UPDATE users 
+        SET {', '.join(updates)}
+        WHERE user_id = ?
+        '''
+        params.append(user_id)
+
+        cursor.execute(query, params)
+        self.conn.commit()
+
     def ban_user(self, user_id: int, moderator_id: int, reason: str):
         cursor = self.conn.cursor()
         cursor.execute('UPDATE users SET is_banned = 1 WHERE user_id = ?', (user_id,))
@@ -155,21 +190,6 @@ class Database:
         ''', (moderator_id, user_id, 'unban', reason, datetime.now()))
         self.conn.commit()
 
-    def update_rating(self, user_id: int, game_result: str):
-        cursor = self.conn.cursor()
-        rating_change = {
-            'win': 25,
-            'lose': -15,
-            'draw': 0
-        }.get(game_result, 0)
-        
-        cursor.execute('''
-        UPDATE users 
-        SET rating = MAX(0, rating + ?)
-        WHERE user_id = ?
-        ''', (rating_change, user_id))
-        self.conn.commit()
-
     def check_daily_limit(self, user_id: int) -> bool:
         cursor = self.conn.cursor()
         cursor.execute('''
@@ -184,7 +204,6 @@ class Database:
             
         games_today, last_reset = result
         
-        # Сброс счетчика если прошел день
         now = datetime.now()
         if last_reset and (now - datetime.fromisoformat(last_reset)).days >= 1:
             cursor.execute('''
@@ -195,4 +214,4 @@ class Database:
             self.conn.commit()
             return True
             
-        return games_today < 100  # Максимум 100 игр в день
+        return games_today < 100
