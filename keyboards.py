@@ -26,110 +26,101 @@ class KeyboardManager:
 
     def get_main_keyboard(self, layout_type: str, lang: str = 'ru') -> InlineKeyboardMarkup:
         texts = {
-            'ru': ['👤 Профиль', '🎮 Игры', '⚙️ Настройки', '🏆 Рейтинг'],
-            'en': ['👤 Profile', '🎮 Games', '⚙️ Settings', '🏆 Rating']
+            'ru': ['👤 Профиль', '🎮 Игры', '⚙️ Настройки', '🏆 Рейтинг', '📜 Правила'],
+            'en': ['👤 Profile', '🎮 Games', '⚙️ Settings', '🏆 Rating', '📜 Rules']
         }
         
         buttons = [
             {'text': text, 'callback_data': data}
-            for text, data in zip(texts[lang], ['profile', 'games', 'settings', 'rating'])
+            for text, data in zip(texts[lang], ['profile', 'games', 'settings', 'rating', 'rules'])
         ]
         
         return InlineKeyboardMarkup(
             inline_keyboard=self.layouts[layout_type](buttons)
         )
 
-    def get_settings_keyboard(self, layout_type: str, lang: str = 'ru') -> InlineKeyboardMarkup:
+    def get_games_keyboard(self, layout_type: str, lang: str = 'ru') -> InlineKeyboardMarkup:
         texts = {
-            'ru': ['📱 Расположение кнопок', '🌍 Язык', '🔙 Назад'],
-            'en': ['📱 Button Layout', '🌍 Language', '🔙 Back']
+            'ru': ['🎲 21 (Блэкджек)', '🎰 Рулетка', '🎰 Слоты', '🔙 Назад'],
+            'en': ['🎲 21 (Blackjack)', '🎰 Roulette', '🎰 Slots', '🔙 Back']
         }
         
         buttons = [
-            {'text': texts[lang][0], 'callback_data': 'layout_settings'},
-            {'text': texts[lang][1], 'callback_data': 'language_settings'},
-            {'text': texts[lang][2], 'callback_data': 'main_menu'}
+            {'text': texts[lang][0], 'callback_data': 'blackjack'},
+            {'text': texts[lang][1], 'callback_data': 'roulette'},
+            {'text': texts[lang][2], 'callback_data': 'slots'},
+            {'text': texts[lang][3], 'callback_data': 'main_menu'}
         ]
         
         return InlineKeyboardMarkup(
             inline_keyboard=self.layouts[layout_type](buttons)
         )
 
-    def get_layout_keyboard(self, current_layout: str, lang: str = 'ru') -> InlineKeyboardMarkup:
+    def get_slots_keyboard(self, layout_type: str, lang: str = 'ru') -> InlineKeyboardMarkup:
         texts = {
             'ru': {
-                'vertical': '📊 Вертикальное [✓]',
-                'not_vertical': '📊 Вертикальное',
-                'horizontal': '📈 Горизонтальное [✓]',
-                'not_horizontal': '📈 Горизонтальное',
+                'bets': ['💰 10', '💰 50', '💰 100'],
                 'back': '🔙 Назад'
             },
             'en': {
-                'vertical': '📊 Vertical [✓]',
-                'not_vertical': '📊 Vertical',
-                'horizontal': '📈 Horizontal [✓]',
-                'not_horizontal': '📈 Horizontal',
+                'bets': ['💰 10', '💰 50', '💰 100'],
                 'back': '🔙 Back'
             }
         }
         
         buttons = [
-            [InlineKeyboardButton(
-                text=texts[lang]['vertical' if current_layout == 'vertical' else 'not_vertical'],
-                callback_data='set_layout_vertical'
-            )],
-            [InlineKeyboardButton(
-                text=texts[lang]['horizontal' if current_layout == 'horizontal' else 'not_horizontal'],
-                callback_data='set_layout_horizontal'
-            )],
-            [InlineKeyboardButton(text=texts[lang]['back'], callback_data='settings')]
+            {'text': bet, 'callback_data': f'slots_bet_{bet.split()[1]}'}
+            for bet in texts[lang]['bets']
         ]
-        
-        return InlineKeyboardMarkup(inline_keyboard=buttons)
-
-    def get_language_keyboard(self, current_lang: str) -> InlineKeyboardMarkup:
-        buttons = [
-            [InlineKeyboardButton(
-                text=f"🇷🇺 Русский {'[✓]' if current_lang == 'ru' else ''}",
-                callback_data='set_lang_ru'
-            )],
-            [InlineKeyboardButton(
-                text=f"🇬🇧 English {'[✓]' if current_lang == 'en' else ''}",
-                callback_data='set_lang_en'
-            )],
-            [InlineKeyboardButton(text='🔙 Назад/Back', callback_data='settings')]
-        ]
-        
-        return InlineKeyboardMarkup(inline_keyboard=buttons)
-
-    def get_games_keyboard(self, layout_type: str, lang: str = 'ru') -> InlineKeyboardMarkup:
-        texts = {
-            'ru': ['🎲 21 (Блэкджек)', '🔙 Назад'],
-            'en': ['🎲 21 (Blackjack)', '🔙 Back']
-        }
-        
-        buttons = [
-            {'text': texts[lang][0], 'callback_data': 'blackjack'},
-            {'text': texts[lang][1], 'callback_data': 'main_menu'}
-        ]
+        buttons.append({'text': texts[lang]['back'], 'callback_data': 'games'})
         
         return InlineKeyboardMarkup(
             inline_keyboard=self.layouts[layout_type](buttons)
         )
 
-    def get_moderation_keyboard(self, user_id: int, is_banned: bool, lang: str = 'ru') -> InlineKeyboardMarkup:
+    def get_roulette_keyboard(self, layout_type: str, lang: str = 'ru') -> InlineKeyboardMarkup:
         texts = {
-            'ru': ['🚫 Забанить', '✅ Разбанить', '🔙 Назад'],
-            'en': ['🚫 Ban', '✅ Unban', '🔙 Back']
+            'ru': {
+                'colors': ['🔴 Красное', '⚫️ Чёрное', '🟢 Зеро'],
+                'parity': ['2️⃣ Чёт', '1️⃣ Нечет'],
+                'dozens': ['1️⃣ 1-12', '2️⃣ 13-24', '3️⃣ 25-36'],
+                'halves': ['⬇️ 1-18', '⬆️ 19-36'],
+                'actions': ['🎯 Крутить', '🔙 Назад']
+            },
+            'en': {
+                'colors': ['🔴 Red', '⚫️ Black', '🟢 Zero'],
+                'parity': ['2️⃣ Even', '1️⃣ Odd'],
+                'dozens': ['1️⃣ 1-12', '2️⃣ 13-24', '3️⃣ 25-36'],
+                'halves': ['⬇️ 1-18', '⬆️ 19-36'],
+                'actions': ['🎯 Spin', '🔙 Back']
+            }
         }
+
+        buttons = []
         
-        buttons = [[
-            InlineKeyboardButton(
-                text=texts[lang][1 if is_banned else 0],
-                callback_data=f'{"unban" if is_banned else "ban"}_{user_id}'
-            )
-        ], [
-            InlineKeyboardButton(text=texts[lang][2], callback_data='main_menu')
-        ]]
+        buttons.append([
+            InlineKeyboardButton(text=text, callback_data=f'roulette_color_{color}')
+            for text, color in zip(texts[lang]['colors'], ['red', 'black', 'green'])
+        ])
+        
+        buttons.append([
+            InlineKeyboardButton(text=text, callback_data=f'roulette_parity_{parity}')
+            for text, parity in zip(texts[lang]['parity'], ['even', 'odd'])
+        ])
+        
+        buttons.append([
+            InlineKeyboardButton(text=text, callback_data=f'roulette_dozen_{i+1}')
+            for i, text in enumerate(texts[lang]['dozens'])
+        ])
+        
+        buttons.append([
+            InlineKeyboardButton(text=text, callback_data=f'roulette_half_{i+1}')
+            for i, text in enumerate(texts[lang]['halves'])
+        ])
+        
+        buttons.append([
+            InlineKeyboardButton(text=texts[lang]['actions'][0], callback_data='roulette_spin'),
+            InlineKeyboardButton(text=texts[lang]['actions'][1], callback_data='games')
+        ])
         
         return InlineKeyboardMarkup(inline_keyboard=buttons)
