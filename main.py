@@ -14,7 +14,7 @@ import importlib
 logging.basicConfig(level=logging.INFO)
 
 config = Config()
-bot = Bot(token="7760745056:AAE0q8rG-VwBnkffJQXMAfCrFnu9PCQ7_qA")
+bot = Bot(token="TOKEN")
 dp = Dispatcher()
 db = Database()
 kb = KeyboardManager()
